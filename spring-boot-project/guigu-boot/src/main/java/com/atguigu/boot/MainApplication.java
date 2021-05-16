@@ -18,7 +18,7 @@ import org.springframework.context.annotation.ComponentScan;
 //@SpringBootApplication
 @SpringBootConfiguration
 @EnableAutoConfiguration
-@ComponentScan("com.atguigu.boot")
+@ComponentScan("com.atguigu")
 public class MainApplication {
 
 
