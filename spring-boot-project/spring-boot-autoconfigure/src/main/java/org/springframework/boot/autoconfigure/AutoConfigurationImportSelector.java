@@ -107,19 +107,29 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 	 * @param annotationMetadata the annotation metadata of the configuration class
 	 * @return the auto-configurations that should be imported
 	 */
-	protected AutoConfigurationEntry getAutoConfigurationEntry(AutoConfigurationMetadata autoConfigurationMetadata,
+	protected AutoConfigurationEntry getAutoConfigurationEntry(
+			AutoConfigurationMetadata autoConfigurationMetadata,
 			AnnotationMetadata annotationMetadata) {
 		if (!isEnabled(annotationMetadata)) {
+			// 没有开始自动配置，则返回空
 			return EMPTY_ENTRY;
 		}
+		// 获取元数据属性，只有 exclude 和 excludeName
 		AnnotationAttributes attributes = getAttributes(annotationMetadata);
-		List<String> configurations = getCandidateConfigurations(annotationMetadata, attributes);
+		// 根据元数据获取所有配置类集合
+		List<String> configurations = getCandidateConfigurations(annotationMetadata,
+				attributes);
 		configurations = removeDuplicates(configurations);
+		// 获取需要排除的配置类集合
 		Set<String> exclusions = getExclusions(annotationMetadata, attributes);
 		checkExcludedClasses(configurations, exclusions);
+		// 移除需要排除的配置类集合
 		configurations.removeAll(exclusions);
+		// 根据配置的 AutoConfigurationImportFilter 过滤器进一步过滤掉不需要的配置类集合
 		configurations = filter(configurations, autoConfigurationMetadata);
+		// 发布自动配置导入事件
 		fireAutoConfigurationImportEvents(configurations, exclusions);
+		// 构建 AutoConfigurationEntry 对象返回
 		return new AutoConfigurationEntry(configurations, exclusions);
 	}
 
@@ -168,6 +178,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 	 * @return a list of candidate configurations
 	 */
 	protected List<String> getCandidateConfigurations(AnnotationMetadata metadata, AnnotationAttributes attributes) {
+		// 获取 spring.factories 文件中 EnableAutoConfiguration 对应的配置类集合
 		List<String> configurations = SpringFactoriesLoader.loadFactoryNames(getSpringFactoriesLoaderFactoryClass(),
 				getBeanClassLoader());
 		Assert.notEmpty(configurations, "No auto configuration classes found in META-INF/spring.factories. If you "
